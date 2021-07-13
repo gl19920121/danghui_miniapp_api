@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\JobsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,8 +16,16 @@ use App\Http\Controllers\UsersController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::group(['namespace' => 'Api'], function () {
+    Route::get('/code2session', [UsersController::class, 'code2Session']);
+    Route::group(['middleware' => 'auth:api'], function () {
+        Route::post('/user/login', [UsersController::class, 'login']);
+        Route::get('/user', [UsersController::class, 'show']);
+        Route::get('/job', [JobsController::class, 'list']);
+        Route::get('/job/{job}', [JobsController::class, 'show']);
 
-Route::get('/code2session', [UsersController::class, 'code2Session']);
+        Route::group(['middleware' => 'can:signed'], function () {
+            Route::post('/job/{job}/collect', [JobsController::class, 'collect']);
+        });
+    });
+});

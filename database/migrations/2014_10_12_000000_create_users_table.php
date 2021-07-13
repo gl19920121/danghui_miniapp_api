@@ -16,13 +16,16 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('openid');
+            $table->string('session_key');
+            $table->string('password')->comment('登录密码');
             $table->string('unionid')->nullable();
+            $table->string('phone')->nullable()->comment('手机号');
             $table->string('nick_name')->nullable()->comment('用户昵称');
             $table->string('avatar_url')->nullable()->comment('用户头像');
             $table->enum('gender', ['0', '1', '2'])->nullable()->comment('用户性别');
             $table->string('country')->nullable()->comment('用户所在国家
 
-')；
+');
             $table->string('province')->nullable()->comment('用户所在省份
 
 ');

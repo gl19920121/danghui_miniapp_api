@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+// use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -18,9 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'openid', 'session_key', 'password', 'phone',
     ];
 
     /**
@@ -29,8 +29,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'id', 'openid', 'session_key', 'unionid', 'password',
     ];
 
     /**
@@ -39,11 +38,43 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
     ];
+
+    protected $appends = [
+        'is_register',
+    ];
+
+    public function getIsRegisterAttribute()
+    {
+        return empty($this->phone) ? false: true;
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        if (strlen($value) != 60) {
+            $value = bcrypt($value);
+        }
+
+        $this->attributes['password'] = $value;
+    }
 
     public function scopeOpenid($query, $openid)
     {
         return $query->where('openid', $openid);
+    }
+
+    public function scopePhone($query, $phone)
+    {
+        return $query->where('phone', $phone);
+    }
+
+    public function findForPassport($username)
+    {
+        return $this->where('openid', $username)->first();
+    }
+
+    public function validateForPassportPasswordGrant($password)
+    {
+        return Hash::check($password, $this->password);
     }
 }

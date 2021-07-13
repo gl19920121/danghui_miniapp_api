@@ -29,11 +29,17 @@ class AuthServiceProvider extends ServiceProvider
         if (! $this->app->routesAreCached()) {
             Passport::routes();
 
+            Passport::$ignoreCsrfToken = true;
+
             Passport::tokensExpireIn(now()->addDays(15));
 
             Passport::refreshTokensExpireIn(now()->addDays(30));
 
             Passport::personalAccessTokensExpireIn(now()->addMonths(6));
         }
+
+        Gate::define('signed', function ($user) {
+            return $user->is_register;
+        });
     }
 }
