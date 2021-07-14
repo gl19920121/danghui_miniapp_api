@@ -15,6 +15,8 @@ class Job extends Model
     public const STATUS_ALL = 'all';
     public const STATUS_ACTIVE = 'active';
 
+    protected $perPage = 10;
+
     protected $connection = 'mysql_crm';
 
     protected $hidden = [
@@ -30,8 +32,6 @@ class Job extends Model
     protected $appends = [
         'is_collected',
     ];
-
-    protected $perPage = 10;
 
     public function collects()
     {
@@ -126,5 +126,10 @@ class Job extends Model
         if (!empty($education)) {
             return $query->where('education', $education);
         }
+    }
+
+    public function scopeCollect($query)
+    {
+        return $query->whereHas('collects');
     }
 }

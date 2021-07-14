@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -86,7 +86,7 @@ class UsersController extends Controller
         return $this->responseOk($data);
     }
 
-    public function show()
+    public function show(Request $request)
     {
         $data = Auth::user()->toArray();
         return $this->responseOk($data);

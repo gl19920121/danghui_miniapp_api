@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,7 +13,7 @@ class JobsController extends Controller
 {
     public function __construct()
     {
-        // code
+        // ...
     }
 
     public function list(Request $request)
@@ -32,13 +32,21 @@ class JobsController extends Controller
         return $this->responseOk($data);
     }
 
+    public function listCollect(Request $request)
+    {
+        $jobs = Job::status(Job::STATUS_ACTIVE)->collect();
+
+        $data = $jobs->toArray();
+        return $this->responseOk($data);
+    }
+
     public function show(Job $job, Request $request)
     {
         $data = $job->toArray();
         return $this->responseOk($data);
     }
 
-    public function collect(Job $job)
+    public function doCollect(Job $job)
     {
         $jobUser = JobUser::collect(Auth::user()->id, $job->id)->first();
 
