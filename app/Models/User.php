@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 // use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use App\Models\UserIntention;
 
 class User extends Authenticatable
 {
@@ -42,12 +43,22 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'is_register',
+        'is_register', 'jobhunter_status_show',
     ];
+
+    public function intention()
+    {
+        return $this->hasMany(UserIntention::class);
+    }
 
     public function getIsRegisterAttribute()
     {
         return empty($this->phone) ? false: true;
+    }
+
+    public function getJobhunterStatusShowAttribute(): string
+    {
+        return config('lang.resume.jobhunter_status')[$this->jobhunter_status];
     }
 
     public function setPasswordAttribute($value)

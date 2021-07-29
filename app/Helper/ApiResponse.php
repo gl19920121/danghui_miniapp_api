@@ -11,6 +11,7 @@ class ApiResponse
     public const API_FILE_IS_NOT_VALID = 2;
 
     public const API_ACCEPTED = 202;
+    public const API_FORBIDDEN = 403;
     public const API_NOT_FOUND = 404;
 
     public const WECHAT_SYSTEM_BUSY = 1000;
@@ -27,6 +28,7 @@ class ApiResponse
 
     public static $statusTexts = [
         202 => '已经接受请求，但未处理完成',
+        403 => '拒绝处理此次请求',
         404 => '资源未找到',
         1000 => '系统繁忙，请稍后再试',
         1001 => 'code无效',

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\UserIntention;
 use App\Http\Requests\StoreUserIntentionPost;
 use App\Helper\ApiResponse;
+use Illuminate\Support\Facades\Gate;
 
 class UserIntentionsController extends Controller
 {
@@ -14,7 +15,9 @@ class UserIntentionsController extends Controller
     {
         $userIntentions = UserIntention::get();
 
-        $data = $userIntentions->toArray();
+        $data = Array();
+        $data['data'] = $userIntentions->toArray();
+        $data['max_size'] = UserIntention::MAX_SIZE;
         return $this->responseOk($data);
     }
 
@@ -26,6 +29,11 @@ class UserIntentionsController extends Controller
 
     public function store(StoreUserIntentionPost $request)
     {
+        $response = Gate::inspect('create', UserIntention::class, $request->user());
+        if ( ! $response->allowed() ) {
+            return $this->responseFail(ApiResponse::API_FORBIDDEN, $response->message());
+        }
+
         $userIntention = UserIntention::firstOrNew(
             [
                 'type' => $request->type,
@@ -45,7 +53,7 @@ class UserIntentionsController extends Controller
             ]
         );
 
-        if ($userIntention !== NULL) {
+        if ($userIntention->id !== NULL) {
             return $this->responseFail(ApiResponse::API_ACCEPTED, '求职意向已经存在了');
         }
 

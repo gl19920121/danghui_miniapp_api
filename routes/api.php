@@ -29,11 +29,11 @@ Route::group(['namespace' => 'App\Http\Controllers\Api\v1', 'prefix' => 'api/v1'
         Route::get('jobs/{job}', 'JobsController@show');
         Route::get('jobs', 'JobsController@list');
 
-        Route::post('intentios/store', 'UserIntentionsController@store');
-        Route::match(['put', 'patch'], 'intentios/{userIntention}', 'UserIntentionsController@update');
-        Route::delete('intentios/{userIntention}', 'UserIntentionsController@destroy');
-        Route::get('intentios/{userIntention}', 'UserIntentionsController@show');
-        Route::get('intentios', 'UserIntentionsController@list');
+        Route::post('intentions/store', 'UserIntentionsController@store');
+        Route::match(['put', 'patch'], 'intentions/{userIntention}', 'UserIntentionsController@update');
+        Route::delete('intentions/{userIntention}', 'UserIntentionsController@destroy');
+        Route::get('intentions/{userIntention}', 'UserIntentionsController@show');
+        Route::get('intentions', 'UserIntentionsController@list');
 
         Route::post('resumes/store', 'ResumesController@store');
         Route::match(['put', 'patch'], 'resumes/{resume}', 'ResumesController@update');

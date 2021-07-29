@@ -52,7 +52,8 @@ class UsersController extends Controller
         // $openid = 'oKfCB5awT_r4T2arSw-efI8gBh3I';
         // $sessionKey = 'dwTvK82st1hZIgm8slL7sw==';
 
-        if (User::openid($openid)->count() === 0) {
+        $user = User::openid($openid)->first();
+        if ( ! $user ) {
             $user = User::create([
                 'openid' => $openid,
                 'session_key' => $sessionKey,
@@ -63,6 +64,7 @@ class UsersController extends Controller
         $data = [
             'openid' => $openid,
             'session_key' => $sessionKey,
+            'user' => $user->toArray(),
         ];
         return $this->responseOk($data);
     }
