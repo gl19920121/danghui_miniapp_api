@@ -35,6 +35,7 @@ class CreateUsersTable extends Migration
             $table->enum('language', ['en', 'zh_CN', 'zh_TW'])->nullable()->comment('显示 country，province，city 所用的语言
 
 ');
+            $table->tinyInteger('jobhunter_status')->default(0)->comment('求职状态：0 => 在职-暂不考虑，1 => 在职-考虑机会，2 => 在职-月内到岗，3 => 离职-随时到岗');
             $table->timestamps();
             $table->unique('openid');
         });

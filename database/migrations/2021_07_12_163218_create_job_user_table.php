@@ -23,7 +23,7 @@ class CreateJobUserTable extends Migration
 
             $table->unique(['job_id', 'user_id', 'type']);
             // $table->foreign('job_id')->references('id')->on('jobs')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

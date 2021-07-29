@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\User;
@@ -72,12 +73,13 @@ class UsersController extends Controller
             'phone' => 'required',
         ]);
 
-        $openid = Auth::user()->openid;
-        $sessionKey = Auth::user()->session_key;
+        $user = $request->user();
+        $openid = $user->openid;
+        $sessionKey = $user->session_key;
         $phone = $request->phone;
 
-        if (!Auth::user()->is_register) {
-            Auth::user()->update([
+        if ( ! $user->is_register ) {
+            $request->user()->update([
                 'phone' => $phone,
             ]);
         }
@@ -88,7 +90,14 @@ class UsersController extends Controller
 
     public function show(Request $request)
     {
-        $data = Auth::user()->toArray();
+        $data = $request->user()->toArray();
         return $this->responseOk($data);
+    }
+
+    public function update(Request $request)
+    {
+        $request->user()->update($request->all());
+
+        return $this->responseOk();
     }
 }

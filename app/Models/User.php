@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'openid', 'session_key', 'password', 'phone',
+        'openid', 'session_key', 'password', 'phone', 'jobhunter_status',
     ];
 
     /**
@@ -38,6 +38,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
+        'jobhunter_status' => 'integer',
     ];
 
     protected $appends = [

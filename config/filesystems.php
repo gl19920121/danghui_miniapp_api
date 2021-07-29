@@ -53,6 +53,34 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
         ],
 
+        'resume_append' => [
+            'driver' => 'local',
+            'root' => storage_path('app/resume/append'),
+            'url' => env('APP_URL').'/storage/resume/append',
+            'visibility' => 'private',
+        ],
+
+        'resume_avatar' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/resume/avatar'),
+            'url' => env('APP_URL').'/storage/resume/avatar',
+            'visibility' => 'public',
+        ],
+
+        'company_logo' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/company/logo'),
+            'url' => env('CRM_APP_URL').'/storage/company/logo',
+            'visibility' => 'public',
+        ],
+
+        'user_avatar' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/user/avatar'),
+            'url' => env('CRM_APP_URL').'/storage/user/avatar',
+            'visibility' => 'public',
+        ],
+
     ],
 
     /*

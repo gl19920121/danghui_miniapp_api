@@ -15,16 +15,30 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['namespace' => 'App\Http\Controllers\Api\v1', 'prefix' => 'api/v1'], function () {
-    Route::get('/code2session', 'UsersController@code2Session');
+    Route::get('code2session', 'UsersController@code2Session');
     Route::group(['middleware' => 'auth:api'], function () {
-        Route::post('/user/login', 'UsersController@login');
-        Route::get('/user', 'UsersController@show');
-        Route::get('/job', 'JobsController@list');
-        Route::get('/job/{job}', 'show@JobsController');
-
         Route::group(['middleware' => 'can:signed'], function () {
-            Route::get('/job/collect', 'JobsController@listCollect');
-            Route::post('/job/{job}/collect', 'JobsController@doCollect');
+            Route::post('jobs/{job}/collect', 'JobsController@doCollect');
+            Route::get('jobs/collects', 'JobsController@listCollect');
         });
+
+        Route::post('users/login', 'UsersController@login');
+        Route::match(['put', 'patch'], 'users', 'UsersController@update');
+        Route::get('users', 'UsersController@show');
+
+        Route::get('jobs/{job}', 'JobsController@show');
+        Route::get('jobs', 'JobsController@list');
+
+        Route::post('intentios/store', 'UserIntentionsController@store');
+        Route::match(['put', 'patch'], 'intentios/{userIntention}', 'UserIntentionsController@update');
+        Route::delete('intentios/{userIntention}', 'UserIntentionsController@destroy');
+        Route::get('intentios/{userIntention}', 'UserIntentionsController@show');
+        Route::get('intentios', 'UserIntentionsController@list');
+
+        Route::post('resumes/store', 'ResumesController@store');
+        Route::match(['put', 'patch'], 'resumes/{resume}', 'ResumesController@update');
+        Route::delete('resumes/{resume}', 'ResumesController@destroy');
+        Route::get('resumes/{resume}', 'ResumesController@show');
+        Route::get('resumes', 'ResumesController@list');
     });
 });

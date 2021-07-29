@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-use App\Models\User;
 use Auth;
+use App\Models\User;
+use App\Models\Company;
+use App\Models\JobPublisher;
 
 class Job extends Model
 {
@@ -15,7 +17,7 @@ class Job extends Model
     public const STATUS_ALL = 'all';
     public const STATUS_ACTIVE = 'active';
 
-    protected $perPage = 10;
+    protected $perPage = 3;
 
     protected $connection = 'mysql_crm';
 
@@ -27,11 +29,24 @@ class Job extends Model
         'type' => 'json',
         'location' => 'json',
         'channel' => 'array',
+        'is_collected' => 'boolean',
+        'created_at' => 'datetime:Y-m-d h:m:s',
+        'updated_at' => 'datetime:Y-m-d h:m:s',
     ];
 
     protected $appends = [
-        'is_collected',
+        'is_collected', 'experience_show', 'education_show', 'welfare_show', 'last_update_time', 'updated_date',
     ];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function publisher()
+    {
+        return $this->belongsTo(JobPublisher::class, 'execute_uid');
+    }
 
     public function collects()
     {
@@ -44,7 +59,51 @@ class Job extends Model
         return $this->collects()->count() > 0 ? true : false;
     }
 
-    public function scopeStatus($query, $status)
+    public function getExperienceShowAttribute(): string
+    {
+        return config('lang.experience')[$this->experience];
+    }
+
+    public function getEducationShowAttribute(): string
+    {
+        return config('lang.education')[$this->education];
+    }
+
+    public function getWelfareShowAttribute(): string
+    {
+        return config('lang.welfare')[$this->welfare];
+    }
+
+    public function getLastUpdateTimeAttribute(): string
+    {
+        $updatedAt = Carbon::parse($this->updated_at);
+
+        $days = (new Carbon)->diffInDays($updatedAt, true);
+        if ($days > 7) {
+            return $this->updated_date;
+        } elseif ($days > 0) {
+            return sprintf('%s天前', $days);
+        }
+
+        $hours = (new Carbon)->diffInHours($updatedAt, true);
+        if ($hours > 0) {
+            return sprintf('%s小时前', $hours);
+        }
+
+        $minutes = (new Carbon)->diffInMinutes($updatedAt, true);
+        if ($minutes > 0) {
+            return sprintf('%s分钟前', $minutes);
+        }
+
+        return '刚刚';
+    }
+
+    public function getUpdatedDateAttribute(): string
+    {
+        return Carbon::parse($this->updated_at)->format('Y-m-d');
+    }
+
+    public function scopeStatus($query, $status = self::STATUS_ACTIVE)
     {
         if (is_numeric($status)) {
             return $query->where('status', $status);
@@ -89,19 +148,19 @@ class Job extends Model
         return $query;
     }
 
-    public function scopeSearchByCreatedAt($query, $duration)
+    public function scopeSearchByPubdate($query, $pubdate)
     {
-        switch ($duration) {
+        switch ($pubdate) {
             case 'today':
                 return $query->whereDate('created_at', '=', Carbon::today()->toDateString());
                 break;
-            case '3days':
+            case 'lately':
                 return $query->whereDate('created_at', '>', Carbon::today()->modify('-3 days')->toDateString());
                 break;
-            case 'aweek':
+            case 'week':
                 return $query->whereDate('created_at', '>', Carbon::today()->modify('-7 days')->toDateString());
                 break;
-            case 'amonth':
+            case 'month':
                 return $query->whereDate('created_at', '>', Carbon::today()->modify('-1 month')->toDateString());
                 break;
 
@@ -113,7 +172,7 @@ class Job extends Model
     public function scopeSearchByExperience($query, $experience)
     {
         if (!empty($experience)) {
-            if ($experience === 'school/fresh_graduates') {
+            if ($experience === 'noob') {
                 return $query->whereIn('experience', ['school', 'fresh_graduates']);
             } else {
                 return $query->where('experience', $experience);
@@ -130,6 +189,16 @@ class Job extends Model
 
     public function scopeCollect($query)
     {
-        return $query->whereHas('collects');
+        // $connection = 'mysql';
+        // return $this->setConnection($connection)->$query
+        //     ->rightJoin('job_user', 'jobs.id', '=', 'job_user.job_id')
+        //     ->where('job_user.user_id', Auth::user()->id)
+        // ;
+        $dbminiapp =  env('DB_DATABASE');
+        // die(var_dump($dbminiapp));
+        return $query
+            ->rightJoin($dbminiapp.'.job_user', 'jobs.id', '=', 'job_user.job_id')
+            ->where('job_user.user_id', Auth::user()->id)
+        ;
     }
 }
