@@ -21,7 +21,7 @@ class JobsController extends Controller
     {
         $jobs = Job::status(Job::STATUS_ACTIVE)
             ->searchByType($request->input('type', ''))
-            ->searchByLocation($request->input('location', ''))
+            // ->searchByLocation($request->input('location', ''))
             ->searchBySalary($request->input('salary_min', ''), $request->input('salary_max', ''))
             ->searchByPubdate($request->input('pubdate', ''))
             ->searchByExperience($request->input('experience', ''))
