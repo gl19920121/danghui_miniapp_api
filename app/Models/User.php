@@ -10,6 +10,8 @@ use Laravel\Passport\HasApiTokens;
 // use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use App\Models\UserIntention;
+use App\Models\Resume;
+use App\Models\Message;
 
 class User extends Authenticatable
 {
@@ -43,15 +45,35 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'is_register', 'jobhunter_status_show',
+        'is_signup', 'jobhunter_status_show', 'resume_count', 'resume_rungs',
     ];
+
+    public function acceptMessages()
+    {
+        return $this->hasMany(Message::class, 'accept_uid');
+    }
+
+    public function sendMessages()
+    {
+        return $this->hasMany(Message::class, 'send_uid', 'openid');
+    }
 
     public function intention()
     {
         return $this->hasMany(UserIntention::class);
     }
 
-    public function getIsRegisterAttribute()
+    public function resumes()
+    {
+        return $this->hasMany(Resume::class, 'upload_uid', 'openid');
+    }
+
+    // public function getIdAttribute()
+    // {
+    //     return $this->openid;
+    // }
+
+    public function getIsSignupAttribute()
     {
         return empty($this->phone) ? false: true;
     }
@@ -59,6 +81,29 @@ class User extends Authenticatable
     public function getJobhunterStatusShowAttribute(): string
     {
         return config('lang.resume.jobhunter_status')[$this->jobhunter_status];
+    }
+
+    public function getAvatarUrlAttribute(): String
+    {
+        if (!empty($this->attributes['avatar_url'])) {
+            $url = Storage::disk('resume_avatar')->url($this->attributes['avatar']);
+        } elseif ($this->gender === '1') {
+            $url = 'images/avatar_default_white_man.png'; // female
+        } else {
+            $url = 'images/avatar_default_white_man.png';
+        }
+
+        return asset($url);
+    }
+
+    public function getResumeCountAttribute(): Int
+    {
+        return $this->resumes()->count();
+    }
+
+    public function getResumeRungsAttribute(): Int
+    {
+        return $this->resume_count > 0 ? $this->resumes()->first()->rungs : 0;
     }
 
     public function setPasswordAttribute($value)

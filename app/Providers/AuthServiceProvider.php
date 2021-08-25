@@ -6,7 +6,9 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use Laravel\Passport\Passport;
 use App\Models\UserIntention;
+use App\Models\Resume;
 use App\Policies\UserIntentionPolicy;
+use App\Policies\ResumePolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         UserIntention::class => UserIntentionPolicy::class,
+        Resume::class => ResumePolicy::class,
     ];
 
     /**
@@ -42,7 +45,7 @@ class AuthServiceProvider extends ServiceProvider
         }
 
         Gate::define('signed', function ($user) {
-            return $user->is_register;
+            return $user->is_signup;
         });
     }
 }

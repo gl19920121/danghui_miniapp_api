@@ -24,4 +24,14 @@ class JobUser extends Pivot
     {
         return $query->where('user_id', Auth::user()->id)->where('type', 'collect');
     }
+
+    public function scopeIsDeliver($query, $userId, $jobId)
+    {
+        return $query->where('user_id', $userId)->where('job_id', $jobId)->where('type', 'deliver');
+    }
+
+    public function scopeMyDeliver($query)
+    {
+        return $query->where('user_id', Auth::user()->id)->where('type', 'deliver');
+    }
 }

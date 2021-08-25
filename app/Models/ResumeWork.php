@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Resume;
 
 class ResumeWork extends Model
 {
@@ -20,10 +21,43 @@ class ResumeWork extends Model
         'salary_count' => 'integer',
         'job_type' => 'json',
         'subordinates' => 'integer',
-        'start_at' => 'date',
-        'end_at' => 'date',
+        'start_at' => 'date:Y-m',
+        'end_at' => 'date:Y-m',
         'is_not_end' => 'boolean',
     ];
+
+    protected $appends = ['job_type_show', 'duration'];
+
+    public function resume()
+    {
+        return $this->belongsTo(Resume::class);
+    }
+
+    public function getJobTypeShowAttribute(): String
+    {
+        return $this->job_type['rd'];
+    }
+
+    public function getStartAtShowAttribute(): String
+    {
+        return date('Y.m', strtotime($this->start_at));
+    }
+
+    public function getEndAtShowAttribute(): String
+    {
+        return date('Y.m', strtotime($this->start_at));
+    }
+
+    public function getDurationAttribute()
+    {
+        if ($this->is_not_end) {
+            $duration = sprintf('%s-至今', $this->start_at_show);
+        } else {
+            $duration = sprintf('%s-%s', $this->start_at_show, $this->end_at_show);
+        }
+
+        return $duration;
+    }
 
     // public function setIsNotEndAttribute($value)
     // {

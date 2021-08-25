@@ -17,7 +17,7 @@ class Job extends Model
     public const STATUS_ALL = 'all';
     public const STATUS_ACTIVE = 'active';
 
-    protected $perPage = 3;
+    protected $perPage = 10;
 
     protected $connection = 'mysql_crm';
 
@@ -35,7 +35,7 @@ class Job extends Model
     ];
 
     protected $appends = [
-        'is_collected', 'experience_show', 'education_show', 'welfare_show', 'last_update_time', 'updated_date',
+        'is_collected', 'is_delivered', 'experience_show', 'education_show', 'welfare_show', 'last_update_time', 'updated_date',
     ];
 
     public function company()
@@ -54,9 +54,20 @@ class Job extends Model
         return $this->setConnection($connection)->belongsToMany(User::class)->wherePivot('user_id', Auth::user()->id)->wherePivot('type', 'collect')->withTimestamps();
     }
 
+    public function delivers()
+    {
+        $connection = 'mysql';
+        return $this->setConnection($connection)->belongsToMany(User::class)->wherePivot('user_id', Auth::user()->id)->wherePivot('type', 'deliver')->withTimestamps();
+    }
+
     public function getIsCollectedAttribute(): bool
     {
         return $this->collects()->count() > 0 ? true : false;
+    }
+
+    public function getIsDeliveredAttribute(): bool
+    {
+        return $this->delivers()->count() > 0 ? true : false;
     }
 
     public function getExperienceShowAttribute(): string
@@ -125,7 +136,7 @@ class Job extends Model
     public function scopeSearchByType($query, $type)
     {
         if (!empty($type)) {
-            return $query->whereJsonContains('type', $type);
+            return $query->where('type->st', 'like', '%'.$type.'%');
         }
     }
 
@@ -138,11 +149,16 @@ class Job extends Model
 
     public function scopeSearchBySalary($query, $salaryMin, $salaryMax)
     {
-        if (!empty($salaryMin)) {
-            $query->where('salary_min', '>=', $salaryMin);
-        }
-        if (!empty($salaryMax)) {
-            $query->where('salary_max', '<=', $salaryMax);
+        if (!empty($salaryMin) && !empty($salaryMax)) {
+            $query->where(function ($query) use ($salaryMin, $salaryMax) {
+                $query->where('salary_min', '>=', $salaryMin)->where('salary_min', '<=', $salaryMax);
+            })->orWhere(function ($query) use ($salaryMin, $salaryMax) {
+                $query->where('salary_min', '<=', $salaryMin)->where('salary_max', '>=', $salaryMin);
+            });
+        } else if (empty($salaryMin) && !empty($salaryMax)) {
+            $query->where('salary_min', '<=', $salaryMax);
+        } else if (!empty($salaryMin) && empty($salaryMax)) {
+            $query->where('salary_max', '>=', $salaryMin);
         }
 
         return $query;

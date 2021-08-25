@@ -22,10 +22,14 @@ Route::group(['namespace' => 'App\Http\Controllers\Api\v1', 'prefix' => 'api/v1'
             Route::get('jobs/collects', 'JobsController@listCollect');
         });
 
+        Route::post('wechat/encode', 'WechatController@dataEncode');
+
         Route::post('users/login', 'UsersController@login');
         Route::match(['put', 'patch'], 'users', 'UsersController@update');
         Route::get('users', 'UsersController@show');
 
+        Route::post('jobs/{job}/deliver', 'JobsController@doDeliver');
+        Route::get('jobs/deliver', 'JobsController@listDeliver');
         Route::get('jobs/{job}', 'JobsController@show');
         Route::get('jobs', 'JobsController@list');
 
@@ -36,9 +40,21 @@ Route::group(['namespace' => 'App\Http\Controllers\Api\v1', 'prefix' => 'api/v1'
         Route::get('intentions', 'UserIntentionsController@list');
 
         Route::post('resumes/store', 'ResumesController@store');
+        Route::post('resumes/{resume}/send', 'ResumesController@send');
         Route::match(['put', 'patch'], 'resumes/{resume}', 'ResumesController@update');
         Route::delete('resumes/{resume}', 'ResumesController@destroy');
+        Route::get('resumes/mine', 'ResumesController@mine');
         Route::get('resumes/{resume}', 'ResumesController@show');
         Route::get('resumes', 'ResumesController@list');
+
+        Route::post('messages/read', 'MessagesController@read');
+        Route::match(['put', 'patch'], 'messages/{message}', 'MessagesController@update');
+        Route::delete('messages/{message}', 'MessagesController@destroy');
+        Route::get('messages', 'MessagesController@list');
     });
 });
+
+Route::get('/ws', function () {
+    // 响应状态码200的任意内容
+    return;
+})->middleware(['auth:api']);

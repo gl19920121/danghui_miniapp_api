@@ -33,9 +33,9 @@ class UserIntention extends Model
         return $this->position['rd'];
     }
 
-    public function getIndustryShowAttribute(): string
+    public function getIndustryShowAttribute(): Array
     {
-        return $this->industry['th'];
+        return array_column($this->industry, 'th');
     }
 
     public function getSalaryShowAttribute(): string

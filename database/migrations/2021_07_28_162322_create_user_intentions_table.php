@@ -18,7 +18,7 @@ class CreateUserIntentionsTable extends Migration
             $table->enum('type', ['full', 'part', 'all'])->comment('求职类型');
             $table->string('city')->comment('工作城市');
             $table->json('position')->comment('期望职位');
-            $table->json('industry')->comment('期望行业');
+            $table->json('industry')->nullable()->comment('期望行业');
             $table->json('salary')->comment('薪资要求');
             $table->foreignId('user_id')->constrained()->onUpdate('cascade')->onDelete('cascade')->comment('用户ID');
             $table->timestamps();

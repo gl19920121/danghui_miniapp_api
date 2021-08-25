@@ -8,6 +8,7 @@ use App\Models\UserIntention;
 use App\Http\Requests\StoreUserIntentionPost;
 use App\Helper\ApiResponse;
 use Illuminate\Support\Facades\Gate;
+use Auth;
 
 class UserIntentionsController extends Controller
 {
@@ -39,9 +40,9 @@ class UserIntentionsController extends Controller
                 'type' => $request->type,
                 'city' => $request->city,
                 'position->rd' => $request->position['rd'],
-                'industry->th' => $request->industry['th'],
+                // 'industry->th' => $request->industry['th'],
                 // 'salary' => $request->salary,
-                'user_id' => $request->user()->id,
+                'user_id' => Auth::user()->id,
             ],
             [
                 'type' => $request->type,
@@ -49,7 +50,7 @@ class UserIntentionsController extends Controller
                 'position' => $request->position,
                 'industry' => $request->industry,
                 'salary' => $request->salary,
-                'user_id' => $request->user()->id,
+                'user_id' => Auth::user()->id,
             ]
         );
 

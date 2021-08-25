@@ -13,6 +13,7 @@ use App\Models\ResumeWork;
 use App\Models\ResumePrj;
 use App\Models\ResumeEdu;
 use App\Helper\ApiResponse;
+use Illuminate\Support\Facades\Gate;
 
 class ResumesController extends Controller
 {
@@ -24,8 +25,25 @@ class ResumesController extends Controller
         return $this->responseOk($data);
     }
 
-    public function show(Resume $resume)
+    public function show(Resume $resume, Request $request)
     {
+        $response = Gate::inspect('view', $resume, $request->user());
+        if ( ! $response->allowed() ) {
+            return $this->responseFail(ApiResponse::API_FORBIDDEN, $response->message());
+        }
+
+        $data = $resume->toArray();
+        $data['resume_works'] = $resume->resumeWorks;
+        $data['resume_prjs'] = $resume->resumePrjs;
+        $data['resume_edus'] = $resume->resumeEdus;
+        return $this->responseOk($data);
+    }
+
+    public function mine(Request $request)
+    {
+        // $resume = $request->user()->resumes->first();
+        $resume = Resume::where('upload_uid', Auth::user()->openid)->first();
+
         $data = $resume->toArray();
         $data['resume_works'] = $resume->resumeWorks;
         $data['resume_prjs'] = $resume->resumePrjs;
@@ -57,7 +75,7 @@ class ResumesController extends Controller
 
         $data = $request->except(['avatar', 'attachment', 'work_experience', 'project_experience', 'education_experience']);
         // die(var_dump($request->all()));
-        $data['upload_uid'] = $request->user()->id;
+        $data['upload_uid'] = $request->user()->openid;
         $data['avatar'] = $avatarPath;
         $data['attachment_path'] = $resumePath;
         $data['source'] = array_keys($data['source']);
@@ -146,6 +164,14 @@ class ResumesController extends Controller
         }
 
         $resume->delete();
+
+        return $this->responseOk();
+    }
+
+    public function send($resume, $request)
+    {
+        $resume->job_id = $request->job_id;
+        $resume->save();
 
         return $this->responseOk();
     }

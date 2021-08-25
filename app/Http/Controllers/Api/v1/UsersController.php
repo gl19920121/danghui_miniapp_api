@@ -59,7 +59,12 @@ class UsersController extends Controller
                 'session_key' => $sessionKey,
                 'password' => bcrypt($openid),
             ]);
+        } else {
+            $user->session_key = $sessionKey;
         }
+
+        $user->nick_name = 'wx_' . $user->id . rand(1000000, 9999999);
+        $user->save();
 
         $data = [
             'openid' => $openid,
@@ -75,18 +80,17 @@ class UsersController extends Controller
             'phone' => 'required',
         ]);
 
-        $user = $request->user();
-        $openid = $user->openid;
-        $sessionKey = $user->session_key;
+        $user = Auth::user();
+        // $openid = $user->openid;
+        // $sessionKey = $user->session_key;
         $phone = $request->phone;
 
         if ( ! $user->is_register ) {
-            $request->user()->update([
-                'phone' => $phone,
-            ]);
+            $user->phone = $phone;
+            $user->save();
         }
 
-        $data = Auth::user()->toArray();
+        $data = $user->toArray();
         return $this->responseOk($data);
     }
 

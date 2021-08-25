@@ -27,7 +27,7 @@ class StoreUserIntentionPost extends FormRequest
             'type' => ['required'],
             'city' => ['required'],
             'position' => ['required'],
-            'industry' => ['required'],
+            'industry' => ['nullable'],
             'salary' => ['required']
         ];
     }

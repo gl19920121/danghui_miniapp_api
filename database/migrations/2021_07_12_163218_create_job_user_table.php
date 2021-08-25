@@ -17,7 +17,7 @@ class CreateJobUserTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('job_id')->comment('职位id');
             $table->unsignedInteger('user_id')->comment('用户id');
-            $table->enum('type', ['collect'])->comment('操作行为');
+            $table->enum('type', ['collect', 'deliver'])->comment('操作行为');
             $table->integer('times')->nullable()->default(1)->comment('操作次数');
             $table->timestamps();
 

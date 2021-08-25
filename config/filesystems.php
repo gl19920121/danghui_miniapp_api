@@ -56,14 +56,14 @@ return [
         'resume_append' => [
             'driver' => 'local',
             'root' => storage_path('app/resume/append'),
-            'url' => env('APP_URL').'/storage/resume/append',
+            'url' => env('CRM_APP_URL').'/storage/resume/append',
             'visibility' => 'private',
         ],
 
         'resume_avatar' => [
             'driver' => 'local',
             'root' => storage_path('app/public/resume/avatar'),
-            'url' => env('APP_URL').'/storage/resume/avatar',
+            'url' => env('CRM_APP_URL').'/storage/resume/avatar',
             'visibility' => 'public',
         ],
 

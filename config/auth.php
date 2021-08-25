@@ -46,6 +46,12 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
+        // 'ws' => [
+        //     'driver' => 'passport',
+        //     'provider' => 'users',
+        //     'hash' => false,
+        // ],
     ],
 
     /*
