@@ -83,7 +83,9 @@ class Resume extends Model
 
     public function getWorkYearsShowAttribute(): String
     {
-        if ($this->work_years_flag === 0) {
+        if ($this->work_years_flag === null) {
+            return '';
+        } else if ($this->work_years_flag === 0) {
             return sprintf('%s年经验', $this->work_years);
         } else {
             return config('lang.resume.work_years')[$this->work_years_flag];

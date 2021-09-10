@@ -45,7 +45,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'is_signup', 'jobhunter_status_show', 'resume_count', 'resume_rungs',
+        'is_signup', 'jobhunter_status_show', 'has_resume', 'resume_count', 'resume_rungs',
     ];
 
     public function acceptMessages()
@@ -94,6 +94,11 @@ class User extends Authenticatable
         }
 
         return asset($url);
+    }
+
+    public function getHasResumeAttribute(): Bool
+    {
+        return $this->resumes()->count() > 0;
     }
 
     public function getResumeCountAttribute(): Int

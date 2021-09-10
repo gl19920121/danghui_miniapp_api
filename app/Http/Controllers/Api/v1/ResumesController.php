@@ -33,9 +33,9 @@ class ResumesController extends Controller
         }
 
         $data = $resume->toArray();
-        $data['resume_works'] = $resume->resumeWorks;
-        $data['resume_prjs'] = $resume->resumePrjs;
-        $data['resume_edus'] = $resume->resumeEdus;
+        $data['work_experience'] = $resume->resumeWorks;
+        $data['project_experience'] = $resume->resumePrjs;
+        $data['education_experience'] = $resume->resumeEdus;
         return $this->responseOk($data);
     }
 
@@ -44,10 +44,34 @@ class ResumesController extends Controller
         // $resume = $request->user()->resumes->first();
         $resume = Resume::where('upload_uid', Auth::user()->openid)->first();
 
-        $data = $resume->toArray();
-        $data['resume_works'] = $resume->resumeWorks;
-        $data['resume_prjs'] = $resume->resumePrjs;
-        $data['resume_edus'] = $resume->resumeEdus;
+        if ($resume !== null) {
+            $data = $resume->toArray();
+            $data['has_resume'] = true;
+            $data['work_experience'] = $resume->resumeWorks;
+            $data['project_experience'] = $resume->resumePrjs;
+            $data['education_experience'] = $resume->resumeEdus;
+        } else {
+            $data = [
+                'has_resume' => false
+            ];
+        }
+
+        return $this->responseOk($data);
+    }
+
+    public function uploadAvatar(Request $request)
+    {
+        $avatarPath = NULL;
+        $avatar = $request->file('avatar');
+        if($request->hasFile('avatar')) {
+            if (!$avatar->isValid()) {
+                return $this->responseFail(ApiResponse::API_FILE_IS_NOT_VALID, '头像上传失败');
+            }
+            $avatarPath = Storage::disk('resume_avatar')->putFile(date('Y-m-d').'/'.Auth::user()->id, $avatar);
+        }
+        unset($avatar);
+
+        $data = [ 'avatar_url' => $avatarPath ];
         return $this->responseOk($data);
     }
 
@@ -73,21 +97,26 @@ class ResumesController extends Controller
         }
         unset($file);
 
-        $data = $request->except(['avatar', 'attachment', 'work_experience', 'project_experience', 'education_experience']);
+        $data = $request->except(['avatar', 'attachment',
+            'work_experience', 'project_experience', 'education_experience',
+            'avatar_url', 'education_show',
+            // 'is_show_real_name', 'work_at', 'birthday', 'self_introduction'
+        ]);
         // die(var_dump($request->all()));
-        $data['upload_uid'] = $request->user()->openid;
+        $data['upload_uid'] = Auth::user()->openid;
         $data['avatar'] = $avatarPath;
         $data['attachment_path'] = $resumePath;
-        $data['source'] = array_keys($data['source']);
+        // $data['source'] = array_keys($data['source']);
+        $data['source'] = ['applets'];
         if ($request->exp_salary_flag === 1) {
             $data['exp_salary_min'] = NULL;
             $data['exp_salary_max'] = NULL;
             $data['exp_salary_count'] = NULL;
         }
 
-        $work = $request->input('work_experience');
-        $project = $request->input('project_experience');
-        $education = $request->input('education_experience');
+        $work = $request->input('work_experience', []);
+        $project = $request->input('project_experience', []);
+        $education = $request->input('education_experience', []);
 
         DB::beginTransaction();
         try {
@@ -95,6 +124,7 @@ class ResumesController extends Controller
             $resume->save();
 
             foreach ($work as $key => $value) {
+                // unset($value['work_at']);
                 $resumeWork = new ResumeWork($value);
                 $resumeWork->resume_id = $resume->id;
                 $resumeWork->save();
@@ -145,13 +175,19 @@ class ResumesController extends Controller
 
         $data = $request->except('avatar', 'attachment', 'work_experience', 'project_experience', 'education_experience');
         foreach ($data as $key => $value) {
-            if (empty($value)) {
-                unset($data[$key]);
+            if (!empty($value)) {
+                $resume->$key = $value;
             }
         }
-        $resume->update($data);
+        $resume->save();
+        // foreach ($data as $key => $value) {
+        //     if (empty($value)) {
+        //         unset($data[$key]);
+        //     }
+        // }
+        // $resume->update($data);
 
-        return $this->responseOk();
+        return $this->responseOk($resume->toArray());
     }
 
     public function destroy(Resume $resume)
@@ -172,6 +208,90 @@ class ResumesController extends Controller
     {
         $resume->job_id = $request->job_id;
         $resume->save();
+
+        return $this->responseOk();
+    }
+
+    public function workStore(Resume $resume, Request $request)
+    {
+        $resumeWork = new ResumeWork($request->all());
+        $resumeWork->resume_id = $resume->id;
+        $resumeWork->save();
+
+        $data = $resumeWork->toArray();
+        return $this->responseOk($data);
+    }
+
+    public function workUpdate(Resume $resume, ResumeWork $resumeWork, Request $request)
+    {
+        $data = $request->except('id', 'resume_id');
+        foreach ($data as $key => $value) {
+            $resumeWork->$key = $value;
+        }
+        $resume->resumeWorks()->save($resumeWork);
+
+        return $this->responseOk();
+    }
+
+    public function workDestroy(Resume $resume, ResumeWork $resumeWork)
+    {
+        $resume->resumeWorks()->delete($resumeWork);
+
+        return $this->responseOk();
+    }
+
+    public function educationStore(Resume $resume, Request $request)
+    {
+        $resumeEdu = new ResumeEdu($request->all());
+        $resumeEdu->resume_id = $resume->id;
+        $resumeEdu->save();
+
+        $data = $resumeEdu->toArray();
+        return $this->responseOk($data);
+    }
+
+    public function educationUpdate(Resume $resume, ResumeEdu $resumeEdu, Request $request)
+    {
+        $data = $request->except('id', 'resume_id');
+        foreach ($data as $key => $value) {
+            $resumeEdu->$key = $value;
+        }
+        $resume->resumeEdus()->save($resumeEdu);
+
+        return $this->responseOk();
+    }
+
+    public function educationDestroy(Resume $resume, ResumeEdu $resumeEdu)
+    {
+        $resume->resumeEdus()->delete($resumeEdu);
+
+        return $this->responseOk();
+    }
+
+    public function projectStore(Resume $resume, Request $request)
+    {
+        $resumePrj = new ResumePrj($request->all());
+        $resumePrj->resume_id = $resume->id;
+        $resumePrj->save();
+
+        $data = $resumePrj->toArray();
+        return $this->responseOk($data);
+    }
+
+    public function projectUpdate(Resume $resume, ResumePrj $resumePrj, Request $request)
+    {
+        $data = $request->except('id', 'resume_id');
+        foreach ($data as $key => $value) {
+            $resumePrj->$key = $value;
+        }
+        $resume->resumePrjs()->save($resumePrj);
+
+        return $this->responseOk();
+    }
+
+    public function projectDestroy(Resume $resume, ResumePrj $resumePrj)
+    {
+        $resume->resumePrjs()->delete($resumePrj);
 
         return $this->responseOk();
     }

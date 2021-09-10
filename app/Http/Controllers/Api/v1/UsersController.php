@@ -102,7 +102,7 @@ class UsersController extends Controller
 
     public function update(Request $request)
     {
-        $request->user()->update($request->all());
+        Auth::user()->update($request->all());
 
         return $this->responseOk();
     }
