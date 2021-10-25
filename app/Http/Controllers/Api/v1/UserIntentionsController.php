@@ -14,7 +14,7 @@ class UserIntentionsController extends Controller
 {
     public function list()
     {
-        $userIntentions = UserIntention::get();
+        $userIntentions = UserIntention::mine()->get();
 
         $data = Array();
         $data['data'] = $userIntentions->toArray();

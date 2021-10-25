@@ -3,17 +3,19 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Auth;
 use App\Http\Requests\StoreResumePost;
 use App\Models\Resume;
 use App\Models\ResumeWork;
 use App\Models\ResumePrj;
 use App\Models\ResumeEdu;
 use App\Helper\ApiResponse;
+// use App\Mail\ResumeAttachment;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
+use Auth;
 
 class ResumesController extends Controller
 {
@@ -204,10 +206,24 @@ class ResumesController extends Controller
         return $this->responseOk();
     }
 
-    public function send($resume, $request)
+    public function send(Request $request)
     {
-        $resume->job_id = $request->job_id;
-        $resume->save();
+        // $resume->job_id = $request->job_id;
+        // $resume->save();
+
+        // $resume = Auth::user()->resumes->first();
+        // $resume = Resume::find(1);
+        // Mail::to('694986534@qq.com')->send(new ResumeAttachment($resume));
+
+        $view = 'emails.resume';
+        $data = ['name' => 'TT'];
+        $from = 'zhushou@danghui.com';
+        $name = '当会直聘';
+        $to = '694986534@qq.com';
+        $subject = 'test';
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
+            $message->to($to)->subject($subject);
+        });
 
         return $this->responseOk();
     }
@@ -235,7 +251,7 @@ class ResumesController extends Controller
 
     public function workDestroy(Resume $resume, ResumeWork $resumeWork)
     {
-        $resume->resumeWorks()->delete($resumeWork);
+        $resume->resumeWorks()->find($resumeWork->id)->delete();
 
         return $this->responseOk();
     }
@@ -263,7 +279,7 @@ class ResumesController extends Controller
 
     public function educationDestroy(Resume $resume, ResumeEdu $resumeEdu)
     {
-        $resume->resumeEdus()->delete($resumeEdu);
+        $resume->resumeEdus()->find($resumeEdu->id)->delete();
 
         return $this->responseOk();
     }
@@ -291,7 +307,7 @@ class ResumesController extends Controller
 
     public function projectDestroy(Resume $resume, ResumePrj $resumePrj)
     {
-        $resume->resumePrjs()->delete($resumePrj);
+        $resume->resumePrjs()->find($resumePrj->id)->delete();
 
         return $this->responseOk();
     }

@@ -29,6 +29,7 @@ class JobsController extends Controller
             ->searchByPubdate($request->input('pubdate', ''))
             ->searchByExperience($request->input('experience', ''))
             ->searchByEducation($request->input('education', ''))
+            ->search($request->input('search', ''))
             ->with('company')
         ;
         if ($request->filled('location')) {

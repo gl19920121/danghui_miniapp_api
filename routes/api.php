@@ -22,6 +22,9 @@ Route::group(['namespace' => 'App\Http\Controllers\Api\v1', 'prefix' => 'api/v1'
             Route::get('jobs/collects', 'JobsController@listCollect');
         });
 
+        Route::post('sms/send', 'SmsController@send');
+        Route::post('sms/verify', 'SmsController@verify');
+
         Route::post('wechat/encode', 'WechatController@dataEncode');
 
         Route::post('users/login', 'UsersController@login');
@@ -50,7 +53,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Api\v1', 'prefix' => 'api/v1'
         Route::match(['put', 'patch'], 'resumes/{resume}/project/{resumePrj}', 'ResumesController@projectUpdate');
         Route::post('resumes/upload/avatar', 'ResumesController@uploadAvatar');
         Route::post('resumes/store', 'ResumesController@store');
-        Route::post('resumes/{resume}/send', 'ResumesController@send');
+        Route::post('resumes/send', 'ResumesController@send');
         Route::match(['put', 'patch'], 'resumes/{resume}', 'ResumesController@update');
         Route::delete('resumes/{resume}', 'ResumesController@destroy');
         Route::get('resumes/mine', 'ResumesController@mine');

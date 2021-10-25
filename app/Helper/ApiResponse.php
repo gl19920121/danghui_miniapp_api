@@ -20,6 +20,11 @@ class ApiResponse
     public const WECHAT_CODE_MISS = 1003;
     public const WECHAT_FREQUENCY_TOO_HIGH = 1004;
 
+    public const SMS_SEND_FAIL = 2001;
+    public const SMS_SEND_EXCEED_PHONE_SEND_LIMIT = 2002;
+    public const SMS_CHECK_FAIL = 2011;
+    public const SMS_CHECK_OVERDUE = 2012;
+
     protected $statusCode;
 
     protected $statusText;
@@ -35,6 +40,10 @@ class ApiResponse
         1002 => 'code已被使用',
         1003 => '缺少code',
         1004 => '操作频率过高，请稍后尝试',
+        2001 => '发送失败，请稍后重试',
+        2002 => '发送频率过高，请稍后再试',
+        2011 => '验证码错误，请重新填写',
+        2012 => '验证码已过期，请重新发送',
     ];
 
     public static $defaultStatusTexts = [

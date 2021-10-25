@@ -21,8 +21,8 @@ class ResumeWork extends Model
         'salary_count' => 'integer',
         'job_type' => 'json',
         'subordinates' => 'integer',
-        'start_at' => 'date:Y-m',
-        'end_at' => 'date:Y-m',
+        'start_at' => 'date:Y.m',
+        'end_at' => 'date:Y.m',
         'is_not_end' => 'boolean',
     ];
 

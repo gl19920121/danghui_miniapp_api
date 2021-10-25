@@ -217,4 +217,11 @@ class Job extends Model
             ->where('job_user.user_id', Auth::user()->id)
         ;
     }
+
+    public function scopeSearch($query, $search)
+    {
+        if (!empty(($search))) {
+            return $query->where('name', 'like', '%'.$search.'%')->orWhere('type', 'like', '%'.$search.'%')->orWhere('location', 'like', '%'.$search.'%');
+        }
+    }
 }

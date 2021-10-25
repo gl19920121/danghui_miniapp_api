@@ -14,8 +14,8 @@ class ResumeEdu extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'start_at' => 'date',
-        'end_at' => 'date',
+        'start_at' => 'date:Y.m',
+        'end_at' => 'date:Y.m',
         'is_not_end' => 'boolean',
     ];
 
