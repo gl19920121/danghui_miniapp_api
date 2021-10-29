@@ -23,17 +23,17 @@ class Company extends Model
 
     public function getIndustryShowAttribute(): string
     {
-        return $this->industry['th'];
+        return !empty($this->industry['th']) ? $this->industry['th'] : '';
     }
 
     public function getInvestmentShowAttribute(): string
     {
-        return config('lang.company.investment')[$this->investment];
+        return !empty($this->investment) ? config('lang.company.investment')[$this->investment] : '';
     }
 
     public function getScaleShowAttribute(): string
     {
-        return config('lang.company.scale')[$this->scale];
+        return !empty($this->scale) ? config('lang.company.scale')[$this->scale] : '';
     }
 
     public function getLogoUrlAttribute(): string
