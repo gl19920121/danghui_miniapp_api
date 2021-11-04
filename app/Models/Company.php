@@ -39,7 +39,7 @@ class Company extends Model
     public function getLogoUrlAttribute(): string
     {
         if (empty($this->attributes['logo'])) {
-            return 'images/logo_company_default.png';
+            return config('app.url') . '/images/logo_company_default.png';
         } else {
             return asset(Storage::disk('company_logo')->url($this->attributes['logo']));
         }
