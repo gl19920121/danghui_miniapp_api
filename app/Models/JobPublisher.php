@@ -31,8 +31,8 @@ class JobPublisher extends Model
     public function getAvatarUrlAttribute(): string
     {
         if (empty($this->attributes['avatar'])) {
-            $defaultUrl = $this->sex === '女' ? '/images/avatar_default.png' : '/images/avatar_default.png';
-            return env('CRM_APP_URL') . $defaultUrl;
+            $defaultUrl = $this->sex === '女' ? 'avatar_default_female.png' : 'avatar_default_man.png';
+            return config('crm.image_url') . $defaultUrl;
         } else {
             return asset(Storage::disk('user_avatar')->url($this->attributes['avatar']));
         }

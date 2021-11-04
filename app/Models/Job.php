@@ -60,6 +60,11 @@ class Job extends Model
         return $this->setConnection($connection)->belongsToMany(User::class)->wherePivot('user_id', Auth::user()->id)->wherePivot('type', 'deliver')->withTimestamps();
     }
 
+    public function getSalaryCountAttribute(): int
+    {
+        return !empty($this->attributes['salary_count']) ? $this->attributes['salary_count'] : 12;
+    }
+
     public function getIsCollectedAttribute(): bool
     {
         return $this->collects()->count() > 0 ? true : false;
