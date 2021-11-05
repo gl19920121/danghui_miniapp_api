@@ -35,7 +35,7 @@ class Job extends Model
     ];
 
     protected $appends = [
-        'is_collected', 'is_delivered', 'experience_show', 'education_show', 'welfare_show', 'last_update_time', 'updated_date',
+        'is_collected', 'is_delivered', 'location_show', 'experience_show', 'education_show', 'welfare_show', 'nature_show', 'last_update_time', 'updated_date',
     ];
 
     public function company()
@@ -58,6 +58,23 @@ class Job extends Model
     {
         $connection = 'mysql';
         return $this->setConnection($connection)->belongsToMany(User::class)->wherePivot('user_id', Auth::user()->id)->wherePivot('type', 'deliver')->withTimestamps();
+    }
+
+    public function getLocationShowAttribute(): string
+    {
+        $location = [];
+        if (!empty($this->location['province'])) {
+            $location[] = $this->location['province'];
+        }
+        if (!empty($this->location['city'])) {
+            $location[] = $this->location['city'];
+        }
+        if (!empty($this->location['district'])) {
+            $location[] = $this->location['district'];
+        }
+
+        $show = implode('.', $location);
+        return $show;
     }
 
     public function getSalaryCountAttribute(): int
@@ -88,6 +105,11 @@ class Job extends Model
     public function getWelfareShowAttribute(): string
     {
         return config('lang.welfare')[$this->welfare];
+    }
+
+    public function getNatureShowAttribute(): string
+    {
+        return config('lang.job.nature')[$this->nature];
     }
 
     public function getLastUpdateTimeAttribute(): string
