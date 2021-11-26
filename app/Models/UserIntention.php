@@ -35,12 +35,14 @@ class UserIntention extends Model
 
     public function getIndustryShowAttribute(): Array
     {
-        return array_column($this->industry, 'th');
+        return empty($this->industry) ? ['行业不限'] : array_column($this->industry, 'th');
     }
 
     public function getSalaryShowAttribute(): string
     {
-        if (isset($this->salary['negotiation']) && $this->salary['negotiation']) {
+        if (empty($this->salary)) {
+            return '兼职';
+        } else if (isset($this->salary['negotiation']) && $this->salary['negotiation']) {
             return '面议';
         } else {
             return sprintf('%s-%sK', $this->salary['min'], $this->salary['max']);

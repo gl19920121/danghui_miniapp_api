@@ -28,7 +28,19 @@ class StoreUserIntentionPost extends FormRequest
             'city' => ['required'],
             'position' => ['required'],
             'industry' => ['nullable'],
-            'salary' => ['required']
+            'salary' => ['required_if:type,full']
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'salary.required_if' => '请选择薪资要求',
         ];
     }
 }
